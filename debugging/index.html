@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Suma de matrices</title>
+  </head>
+  <body>
+    <h1>Suma de matrices</h1>
+
+    <!-- Cambio de método para evitar comportamiento predeterminado del formulario -->
+    <form id="sumaMatricesForm">
+      <label for="filas1">Filas de la matriz 1:</label>
+      <input type="number" id="filas1" name="filas1"><br>
+      <label for="columnas1">Columnas de la matriz 1:</label>
+      <input type="number" id="columnas1" name="columnas1"><br>
+      <label for="filas2">Filas de la matriz 2:</label>
+      <input type="number" id="filas2" name="filas2"><br>
+      <label for="columnas2">Columnas de la matriz 2:</label>
+      <input type="number" id="columnas2" name="columnas2"><br>
+      <h2>Matriz 1</h2>
+      <div id="matrix1"></div>
+      <h2>Matriz 2</h2>
+      <div id="matrix2"></div>
+      <button type="submit">Sumar matrices</button> <!-- Cambio de <input type="submit> por <button> -->
+    </form>
+
+    <script>
+      // Función para crear inputs para matrices
+      function crearInputs(idDiv, filas, columnas) {
+        let div = document.getElementById(idDiv);
+        div.innerHTML = '';
+
+        for(let i = 0; i < filas; i++) {
+          let fila = document.createElement('div');
+
+          for(let j = 0; j < columnas; j++) {
+            let input = document.createElement('input');
+            input.type = 'number';
+            input.name = idDiv + '[' + i + '][' + j + ']'; // Cambié el nombre para que sea único
+            fila.appendChild(input);
+          }
+
+          div.appendChild(fila);
+        }
+      }
+
+      // Evento para el envío del formulario
+      document.getElementById('sumaMatricesForm').onsubmit = function(event) {
+        event.preventDefault(); // Evita el envío del formulario por defecto
+
+        const filas1 = parseInt(document.getElementById('filas1').value);
+        const columnas1 = parseInt(document.getElementById('columnas1').value);
+        const filas2 = parseInt(document.getElementById('filas2').value);
+        const columnas2 = parseInt(document.getElementById('columnas2').value);
+
+        // Validación para asegurarse de que las matrices tengan las mismas dimensiones
+        if (filas1 !== filas2 || columnas1 !== columnas2) {
+          alert("Las matrices deben tener las mismas dimensiones");
+          return; // Si las dimensiones no coinciden, no enviamos la solicitud
+        }
+
+        // Crear matrices a partir de los inputs
+        let matrix1 = [];
+        let matrix2 = [];
+
+        for (let i = 0; i < filas1; i++) {
+          let row1 = [];
+          let row2 = [];
+
+          const inputs1 = document.querySelectorAll(`#matrix1 div:nth-child(${i + 1}) input`);
+          const inputs2 = document.querySelectorAll(`#matrix2 div:nth-child(${i + 1}) input`);
+
+          for (let j = 0; j < columnas1; j++) {
+            row1.push(parseInt(inputs1[j].value)); // Asegúrate de convertir a número
+            row2.push(parseInt(inputs2[j].value)); // Conversión a número
+          }
+
+          matrix1.push(row1);
+          matrix2.push(row2);
+        }
+
+        // Enviar datos al servidor con fetch
+        fetch('http://localhost:3000/sumar_matrices', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ matrix1, matrix2 }), // Enviar como JSON
+        })
+        .then(response => response.json()) // Leer la respuesta JSON
+        .then(data => {
+          console.log(data);
+          alert('Suma completada: ' + JSON.stringify(data.result)); // Mostrar resultado
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Hubo un error al sumar las matrices');
+        });
+      };
+
+      // Eventos para actualizar inputs según filas y columnas
+      document.getElementById('filas1').addEventListener('input', function() {
+        const filas1 = parseInt(this.value);
+        const columnas1 = parseInt(document.getElementById('columnas1').value);
+        crearInputs('matrix1', filas1, columnas1);
+      });
+
+      document.getElementById('columnas1').addEventListener('input', function() {
+        const filas1 = parseInt(document.getElementById('filas1').value);
+        const columnas1 = parseInt(this.value);
+        crearInputs('matrix1', filas1, columnas1);
+      });
+
+      document.getElementById('filas2').addEventListener('input', function() {
+        const filas2 = parseInt(this.value);
+        const columnas2 = parseInt(document.getElementById('columnas2').value);
+        crearInputs('matrix2', filas2, columnas2);
+      });
+
+      document.getElementById('columnas2').addEventListener('input', function() {
+        const filas2 = parseInt(document.getElementById('filas2').value);
+        const columnas2 = parseInt(this.value);
+        crearInputs('matrix2', filas2, columnas2);
+      });
+    </script>
+  </body>
+</html>
