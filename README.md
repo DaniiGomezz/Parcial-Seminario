@@ -13,8 +13,9 @@ Antes de comenzar, asegúrate de tener instalado:
 
 1. Clona el repositorio o descarga el código fuente y muevete a esa carpeta
    ```
-   git clone <URL_DEL_REPOSITORIO>
-   cd <NOMBRE_DEL_REPOSITORIO>
+   git clone https://github.com/DaniiGomezz/Parcial-Seminario.git
+   cd parcial-seminario
+   cd debugging
    ```
 
 
